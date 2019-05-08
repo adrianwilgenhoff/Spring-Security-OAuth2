@@ -1,90 +1,46 @@
 package com.aew.users.domain;
 
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
-/**
- * A user.
- */
+import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
+
 @Getter
-@Setter
-@ToString
-@EqualsAndHashCode
-@Entity
-@Table(name = "user")
-@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-@NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class User implements Serializable {
-
-    private static final long serialVersionUID = 7894114616549874L;
-
+@NoArgsConstructor
+@Setter
+@Entity
+@Table(name = "users", uniqueConstraints = { @UniqueConstraint(columnNames = "email") })
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "*Please provide your username")
-    @Size(min = 1, max = 50)
-    @Column(length = 50, unique = true, nullable = false)
-    private String login;
+    @Column(nullable = false)
+    private String name;
 
-    @NotNull(message = "*Please provide your password")
-    @Size(min = 1, max = 60,message = "*Your password must have at least 1 characters")
-    @Column(name = "password_hash", length = 60, nullable = false)
-    private String password;
-
-    @NotNull(message = "*Please provide your first name")
-    @Size(max = 50)
-    @Column(name = "first_name", length = 50)
-    private String firstName;
-
-    @Size(max = 50)
-    @NotNull(message = "*Please provide your last name")
-    @Column(name = "last_name", length = 50)
-    private String lastName;
-
-    @NotNull(message = "*Please provide an email")
-    @Email(message = "Please provide a valid Email")
-    @Size(min = 5, max = 254)
-    @Column(length = 254, unique = true)
+    @Email
+    @Column(nullable = false)
     private String email;
 
-    @NotNull
-    @Column(nullable = false)
-    private boolean activated = false;
+    private String imageUrl;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    @JoinTable(name = "user_authority", joinColumns = {
-            @JoinColumn(name = "user_id", referencedColumnName = "id") }, inverseJoinColumns = {
-                    @JoinColumn(name = "authority_name", referencedColumnName = "name") })
-    private Set <Authority> authorities = new HashSet<>();
+    @Column(nullable = false)
+    private Boolean emailVerified = false;
+
+    @JsonIgnore
+    private String password;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private AuthProvider provider;
+
+    private String providerId;
 
 }

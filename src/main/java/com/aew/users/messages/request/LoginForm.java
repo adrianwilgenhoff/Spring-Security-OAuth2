@@ -15,7 +15,7 @@ public class LoginForm {
 
     @NotBlank
     @Size(min = 3, max = 60)
-    private String username;
+    private String email;
 
     @NotBlank
     @Size(min = 6, max = 40)

@@ -1,80 +1,52 @@
 package com.aew.users.security;
 
-import com.aew.users.domain.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.Map;
 
-/**
- * This is the class whose instances will be returned from our custom
- * UserDetailsService. Spring Security will use the information stored in the
- * UserPrincipal object to perform authentication and authorization.
- * 
- * @author Adrian E. Wilgenhoff
- */
-public class UserPrinciple implements UserDetails {
+import com.aew.users.domain.User;
+
+public class UserPrinciple implements OAuth2User, UserDetails {
 
     private static final long serialVersionUID = -5499378464331456762L;
 
     private Long id;
-
-    private String name;
-
-    private String username;
-
     private String email;
-
-    private String lastname;
-
-    @JsonIgnore
     private String password;
-
     private Collection<? extends GrantedAuthority> authorities;
+    private Map<String, Object> attributes;
 
-    public UserPrinciple(Long id, String name, String username, String email, String password,
-            Collection<? extends GrantedAuthority> authorities, String lastname) {
+    public UserPrinciple(Long id, String email, String password, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
-        this.name = name;
-        this.username = username;
         this.email = email;
         this.password = password;
         this.authorities = authorities;
-        this.lastname = lastname;
     }
 
-    public static UserPrinciple build(User user) {
-        List<GrantedAuthority> authorities = user.getAuthorities().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName().name())).collect(Collectors.toList());
+    public static UserPrinciple create(User user) {
+        List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
 
-        return new UserPrinciple(user.getId(), user.getFirstName(), user.getLogin(), user.getEmail(),
-                user.getPassword(), authorities, user.getLastName());
+        return new UserPrinciple(user.getId(), user.getEmail(), user.getPassword(), authorities);
+    }
+
+    public static UserPrinciple create(User user, Map<String, Object> attributes) {
+        UserPrinciple userPrincipal = UserPrinciple.create(user);
+        userPrincipal.setAttributes(attributes);
+        return userPrincipal;
     }
 
     public Long getId() {
         return id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
     public String getEmail() {
         return email;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
     }
 
     @Override
@@ -83,42 +55,46 @@ public class UserPrinciple implements UserDetails {
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
+    public String getUsername() {
+        return email;
     }
 
-    @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
-    @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
-    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
-    @JsonIgnore
     @Override
     public boolean isEnabled() {
         return true;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
+    }
 
-        UserPrinciple user = (UserPrinciple) o;
-        return Objects.equals(id, user.id);
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(Map<String, Object> attributes) {
+        this.attributes = attributes;
+    }
+
+    @Override
+    public String getName() {
+        return String.valueOf(id);
     }
 }
