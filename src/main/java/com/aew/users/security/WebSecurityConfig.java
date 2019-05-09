@@ -98,7 +98,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .authorizationRequestRepository(cookieAuthorizationRequestRepository())
         .and()
             .redirectionEndpoint()
-            .baseUri("/oauth2/callback/*").and().userInfoEndpoint().userService(customOAuth2UserService)
+            .baseUri("/oauth2/callback/*")
+        .and()
+            .userInfoEndpoint().userService(customOAuth2UserService)
         .and()
             .successHandler(oAuth2AuthenticationSuccessHandler).failureHandler(oAuth2AuthenticationFailureHandler);
         // Add our custom Token based authentication filter
