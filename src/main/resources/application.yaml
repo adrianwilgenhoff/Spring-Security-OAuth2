@@ -55,3 +55,27 @@ app:
       - http://localhost:3000/oauth2/redirect
       - myandroidapp://oauth2/redirect
       - myiosapp://oauth2/redirect
+      
+      #Google
+#Accedo a http://localhost:8080/oauth2/authorize/google?redirect_uri y en el uri recibo
+#un token y automaticamente me registra en la bd de datos de la api con los datos extraidos de google.
+#Con ese token ahora puedo acceder a los recursos protegidos de mi api.
+
+#Facebook
+#Accedo a http://localhost:8080/oauth2/authorize/facebook?redirect_uri y en el uri recibo
+#un token y automaticamente me registra en la bd de datos de la api con los datos extraidos de facebook
+#Con ese token ahora puedo acceder a los recursos protegidos de mi api.
+
+#Github
+#Accedo a https://github.com/login/oauth/authorize?client_id=f15dac593817d833742a y en el uri recibo un code.
+#El code que acabamos de recibir es una clave temporal y lo utilizamos para hacer una petici�n 
+#POST a github https://github.com/login/oauth/access_token para que nos de un token de acceso para este usuario.
+#Vamos a hacer la llamada incluyendo los siguientes parametros, client_id, client_secret, code (que acabamos de recibir) 
+#y si hubieramos tenido un state tambien lo incluir�amos.
+#Ahora con el token recibido access_token=5da16386746d7cd605709029683bf6622826a63f&scope=&token_type=bearer
+#Vamos a https://api.github.com/user?access_token=5da16386746d7cd605709029683bf6622826a63f Y otebenes todos los
+#datos publicos del usuario. En postman vamos a https://api.github.com/user con un GET y en Auth ponemos
+#el token. Problema no me registrta en la bd.
+      
+      
+      
